@@ -8,7 +8,7 @@ router.get("/", productController.getProducts);
 
 router.get("/low-stock", productController.getLowStockProducts);
 
-// router.get("/statistics", productController.getProductsStatistics);
+router.get("/statistics", productController.getProductsStatistics);
 
 router.get("/:id", validateObjectId, productController.getOneProduct);
 

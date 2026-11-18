@@ -95,15 +95,39 @@ const getLowStockProducts = async (req, res) => {
   res.status(200).json(lowStockProducts);
 };
 
-// const getProductsStatistics = async (req, res) => {
-//   const productsSum = await Product.countDocuments();
-//   const productValueSum = await Product.aggregate({
-//     $group: { _id: null, totalPrice: { $sum: price } },
-//   });
-//   console.log(productValueSum);
+const getProductsStatistics = async (req, res) => {
+  const productsTotal = await Product.countDocuments();
 
-//   //   const lowStockProducts = await Product.find({ quantity: { $lt: 3 } });
-// };
+  const totalPrice = await Product.aggregate([
+    {
+      $group: {
+        _id: null,
+        total: { $sum: "$price" },
+      },
+    },
+  ]);
+
+  const lowStockItems = await Product.aggregate([
+    {
+      $match: {
+        quantity: { $lt: 3 },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        low: { $sum: 1 },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    totalProducts: productsTotal,
+    totalPrice: totalPrice[0].total,
+    lowStockItems: lowStockItems[0].low,
+  });
+};
+
 module.exports = {
   createProduct,
   getProducts,
@@ -111,5 +135,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getLowStockProducts,
-  //   getProductsStatistics,
+  getProductsStatistics,
 };
